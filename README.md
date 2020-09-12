@@ -2,4 +2,5 @@
 Trivial Musical for educational purposes (see license)
 
 ## Database model
+![](ER.png)
 
