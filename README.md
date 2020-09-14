@@ -1,7 +1,7 @@
 # Trivial Musical
 Trivial Musical for educational purposes (see license)
 
-## Contact
+### Contact
 Marcial Ruiz Escudero
 
 ## Database model
