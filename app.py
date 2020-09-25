@@ -8,19 +8,79 @@
 __author__ = 'EA1HET, EA1GIY'
 __date__ = '12/09/2020'
 
-from fastapi import FastAPI
-import uvicorn
+from flask import Flask, jsonify, make_response
 
 
-title = 'Trivial Musical'
-description = 'This is the backend for a simple trivial game'
-version = '1.0'
+# -- Application initialization. ---------------------------------------------
 
-APP = FastAPI(title=title, description=description, version=version, root_path='', redoc_url='')
+APP = Flask('trivial_musical')
 
 
-@APP.get("/", name='Endpoint "Root"')
+# -- This function controls how to respond to common errors. -----------------
+
+@APP.errorhandler(404)
+def not_found(error):
+    """ HTTP Error 404 Not Found """
+    headers = {}
+    return make_response(
+        jsonify(
+            {
+                'error': 'true',
+                'msg': str(error)
+            }
+        ), 404, headers
+    )
+
+
+@APP.errorhandler(405)
+def not_allowed(error):
+    """ HTTP Error 405 Not Allowed """
+    headers = {}
+    return make_response(
+        jsonify(
+            {
+                'error': 'true',
+                'msg': str(error)
+            }
+        ), 405, headers
+    )
+
+
+@APP.errorhandler(500)
+def internal_error(error):
+    """ HTTP Error 500 Internal Server Error """
+    headers = {}
+    return make_response(
+        jsonify(
+            {
+                'error': 'true',
+                'msg': str(error)
+            }
+        ), 500, headers
+    )
+
+
+# -- This piece of code controls what happens during the HTTP transaction. ---
+
+@APP.before_request
+def before_request():
+    """ This function handles  HTTP request as it arrives to the API """
+    pass
+
+
+@APP.after_request
+def after_request(response):
+    """ This function handles HTTP response before send it back to client  """
+    return response
+
+
+# -- This is where the API effectively starts. -------------------------------
+
+@APP.route('/', methods=['GET'])
 def index():
+    """ This is the main function of the / endpoint """
+
+    # Put now your code here
 
     data = {
         'tstamp': '',
@@ -28,26 +88,18 @@ def index():
         'url_preguntas': ''
     }
 
-    return data
+    headers = {
+        'MyHeader': 'MyHeaderValueHere'
+    }
 
-
-@APP.get('/preguntas', name='Endpoint "Preguntas"')
-def preguntas():
-    """
-    Endpoint for questions (preguntas)
-
-    :param arg1: description
-    :type arg1: type description
-    :return: a dictionary
-    """
-
-    data = {'key': 'value'}
-
-    return data
+    return make_response(
+        jsonify(
+            data
+        ), 200, headers)
 
 
 def main():
-    uvicorn.run(APP, host='127.0.0.1', port=5000)
+    APP.run(host='0.0.0.0', port=5000, debug=True, load_dotenv=True)
 
 
 if __name__ == '__main__':
