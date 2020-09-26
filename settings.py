@@ -5,7 +5,7 @@
 
 """ Project description """
 
-__author__ = 'EA1HET'
+__author__ = 'EA1HET, EA1GIY'
 __date__ = '26/09/2020'
 
 
