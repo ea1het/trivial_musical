@@ -27,8 +27,16 @@ class Config:
     JSON_SORT_KEYS = False
 
     ENV = ENVIR('ENV')
-    DEBUG = ENVIR('DEBUG')
-    TESTING = ENVIR('TESTING')
+
+    if ENVIR('DEBUG') == 'True':
+        DEBUG = True
+    else:
+        DEBUG = False
+
+    if ENVIR('TESTING') == 'True':
+        TESTING = True
+    else:
+        TESTING = False
 
     DB_HOST = ENVIR('DB_HOST')
     DB_USER = ENVIR('DB_USER')
