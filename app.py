@@ -15,8 +15,6 @@ import settings
 
 
 # -- Application initialization. ---------------------------------------------
-# __modeConfig__ = environ.get('MODE_CONFIG') or 'Development'
-
 APP = Flask('trivial_musical')
 APP.config.from_object(getattr(settings, 'Config'))
 
