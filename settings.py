@@ -26,21 +26,14 @@ class Config:
     """ This is the generic loader that sets common attributes and variables """
     JSON_SORT_KEYS = False
 
-    ENV = ENVIR('ENV')
+    ENV = ENVIR('ENV', 'Development')
+    DEBUG = ENVIR.bool('DEBUG', False)
+    TESTING = ENVIR.bool('TESTING', False)
 
-    if ENVIR('DEBUG') == 'True':
-        DEBUG = True
-    else:
-        DEBUG = False
-
-    if ENVIR('TESTING') == 'True':
-        TESTING = True
-    else:
-        TESTING = False
-
-    DB_HOST = ENVIR('DB_HOST')
-    DB_USER = ENVIR('DB_USER')
-    DB_PASSWORD = ENVIR('DB_PASSWORD')
-    DB_DATABASE = ENVIR('DB_DATABASE')
+    DB_HOST = ENVIR('DB_HOST', None)
+    DB_PORT = ENVIR('DB_PORT', 3306)
+    DB_USER = ENVIR('DB_USER', None)
+    DB_PASSWORD = ENVIR('DB_PASSWORD', None)
+    DB_DATABASE = ENVIR('DB_DATABASE', None)
 
     SECRET_KEY = ENVIR('SECRET_KEY') or 'NoSecretKeyDefined'

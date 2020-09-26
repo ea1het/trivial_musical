@@ -20,6 +20,7 @@ import settings
 APP = Flask('trivial_musical')
 APP.config.from_object(getattr(settings, 'Config'))
 
+
 # -- This functions control how to respond to common errors. -----------------
 @APP.errorhandler(404)
 def not_found(error):
