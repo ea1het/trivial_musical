@@ -26,7 +26,7 @@ class Config:
     """ This is the generic loader that sets common attributes and variables """
     JSON_SORT_KEYS = False
 
-    ENV = ENVIR('ENV', 'Development')
+    ENV = ENVIR('ENV', 'development')
     DEBUG = ENVIR.bool('DEBUG', False)
     TESTING = ENVIR.bool('TESTING', False)
 

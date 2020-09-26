@@ -8,11 +8,9 @@
 __author__ = 'EA1HET, EA1GIY'
 __date__ = '12/09/2020'
 
-from os import environ
 from flask import Flask, make_response, url_for
 from datetime import datetime
 import settings
-# esto es una prueba
 
 # -- Application initialization. ---------------------------------------------
 APP = Flask('trivial_musical')
