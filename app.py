@@ -13,15 +13,14 @@ from flask import Flask, make_response, url_for
 from datetime import datetime
 import settings
 
-# -- Application initialization. ---------------------------------------------
 
+# -- Application initialization. ---------------------------------------------
 __modeConfig__ = environ.get('MODE_CONFIG') or 'Development'
+
 APP = Flask('trivial_musical')
 APP.config.from_object(getattr(settings, __modeConfig__.title()))
 
-
-# -- This function controls how to respond to common errors. -----------------
-
+# -- This functions control how to respond to common errors. -----------------
 @APP.errorhandler(404)
 def not_found(error):
     """ HTTP Error 404 Not Found """
@@ -57,7 +56,6 @@ def internal_error(error):
 
 
 # -- This piece of code controls what happens during the HTTP transaction. ---
-
 @APP.before_request
 def before_request():
     """ This function handles HTTP request as it arrives to the API """
@@ -71,9 +69,8 @@ def after_request(response):
 
 
 # -- This is where the API effectively starts. -------------------------------
-
 @APP.route('/preguntas', methods=['GET'])
-def preguntas():
+def get_preguntas():
     """ TBD """
     data = {
         'tstamp': datetime.utcnow().timestamp(),
@@ -81,6 +78,36 @@ def preguntas():
     }
     headers = {}
     return make_response(data, 200, headers)
+
+
+@APP.route('/preguntas', methods=['POST'])
+def post_preguntas():
+    """ TBD """
+    pass
+
+
+@APP.route('/niveles', methods=['POST'])
+def post_niveles():
+    """ TBD """
+    pass
+
+
+@APP.route('/tiempos', methods=['POST'])
+def post_tiempos():
+    """ TBD """
+    pass
+
+
+@APP.route('/categorias/subcategorias', methods=['POST'])
+def post_subcategorias():
+    """ TBD """
+    pass
+
+
+@APP.route('/categorias', methods=['POST'])
+def post_categorias():
+    """ TBD """
+    pass
 
 
 @APP.route('/', methods=['GET'])
@@ -92,7 +119,7 @@ def index():
     data = {
         'tstamp': datetime.utcnow().timestamp(),
         'url_base': url_for('index', _external=True),
-        'url_preguntas': url_for('preguntas', _external=True)
+        'url_preguntas': url_for('get_preguntas', _external=True)
     }
     headers = {
         'MyHeader': 'MyHeaderValueHere'
@@ -101,8 +128,9 @@ def index():
 
 
 def main():
-    APP.run(host='0.0.0.0', port=5000, debug=True, load_dotenv=True)
+    APP.run(host='0.0.0.0', port=5000)
 
 
+# -- This is The main programme instantiation -_------------------------------
 if __name__ == '__main__':
     main()
