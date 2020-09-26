@@ -9,7 +9,7 @@ __author__ = 'EA1HET, EA1GIY'
 __date__ = '26/09/2020'
 
 
-from os import environ, path
+from os import path
 from environs import Env
 
 
@@ -25,35 +25,14 @@ except Exception as e:
 class Config:
     """ This is the generic loader that sets common attributes and variables """
     JSON_SORT_KEYS = False
-    DEBUG = True
-    TESTING = True
 
+    ENV = ENVIR('ENV')
+    DEBUG = ENVIR('DEBUG')
+    TESTING = ENVIR('TESTING')
 
-class Development(Config):
-    """ Development loader, instance of class Config """
-    ENV = 'development'
-    TESTING = False
-    SECRET_KEY = ENVIR('DEV_SK') or 'NotDefined'
-    DB_DICT = ENVIR('DEV_DB') or None
+    DB_HOST = ENVIR('DB_HOST')
+    DB_USER = ENVIR('DB_USER')
+    DB_PASSWORD = ENVIR('DB_PASSWORD')
+    DB_DATABASE = ENVIR('DB_DATABASE')
 
-
-class Testing(Config):
-    """ Testing loader, instance of class Config """
-    ENV = 'testing'
-    DEBUG = False
-    SECRET_KEY = ENVIR('TST_SK') or 'NotDefined'
-    DB_DICT = ENVIR('TST_DB') or None
-
-
-class Production(Config):
-    """ Production loader, instance of class Config """
-    ENV = 'production'
-    DEBUG = False
-    TESTING = False
-    try:
-        SECRET_KEY = ENVIR('PRD_SK')
-        DB_DICT = ENVIR('PRD_DB')
-    except Exception as e:
-        print(f'{e}\n\nProduction variables not defined. Cannot continue!')
-        from sys import exit
-        exit(1)
+    SECRET_KEY = ENVIR('SECRET_KEY') or 'NoSecretKeyDefined'
