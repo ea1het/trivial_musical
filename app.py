@@ -8,12 +8,16 @@
 __author__ = 'EA1HET, EA1GIY'
 __date__ = '12/09/2020'
 
-from flask import Flask, jsonify, make_response
-
+from os import environ
+from flask import Flask, make_response, url_for
+from datetime import datetime
+import settings
 
 # -- Application initialization. ---------------------------------------------
 
+__modeConfig__ = environ.get('MODE_CONFIG') or 'Development'
 APP = Flask('trivial_musical')
+APP.config.from_object(getattr(settings, __modeConfig__.title()))
 
 
 # -- This function controls how to respond to common errors. -----------------
@@ -21,50 +25,42 @@ APP = Flask('trivial_musical')
 @APP.errorhandler(404)
 def not_found(error):
     """ HTTP Error 404 Not Found """
+    data = {
+        'error': 'true',
+        'msg': str(error),
+        'base_url': url_for('index', _external=True)
+    }
     headers = {}
-    return make_response(
-        jsonify(
-            {
-                'error': 'true',
-                'msg': str(error)
-            }
-        ), 404, headers
-    )
+    return make_response(data, 404, headers)
 
 
 @APP.errorhandler(405)
 def not_allowed(error):
     """ HTTP Error 405 Not Allowed """
+    data = {
+        'error': 'true',
+        'msg': str(error)
+    }
     headers = {}
-    return make_response(
-        jsonify(
-            {
-                'error': 'true',
-                'msg': str(error)
-            }
-        ), 405, headers
-    )
+    return make_response(data, 405, headers)
 
 
 @APP.errorhandler(500)
 def internal_error(error):
     """ HTTP Error 500 Internal Server Error """
+    data = {
+        'error': 'true',
+        'msg': str(error)
+    }
     headers = {}
-    return make_response(
-        jsonify(
-            {
-                'error': 'true',
-                'msg': str(error)
-            }
-        ), 500, headers
-    )
+    return make_response(data, 500, headers)
 
 
 # -- This piece of code controls what happens during the HTTP transaction. ---
 
 @APP.before_request
 def before_request():
-    """ This function handles  HTTP request as it arrives to the API """
+    """ This function handles HTTP request as it arrives to the API """
     pass
 
 
@@ -76,6 +72,17 @@ def after_request(response):
 
 # -- This is where the API effectively starts. -------------------------------
 
+@APP.route('/preguntas', methods=['GET'])
+def preguntas():
+    """ TBD """
+    data = {
+        'tstamp': datetime.utcnow().timestamp(),
+        'base_url': url_for('index', _external=True)
+    }
+    headers = {}
+    return make_response(data, 200, headers)
+
+
 @APP.route('/', methods=['GET'])
 def index():
     """ This is the main function of the / endpoint """
@@ -83,19 +90,14 @@ def index():
     # Put now your code here
 
     data = {
-        'tstamp': '',
-        'url_base': '',
-        'url_preguntas': ''
+        'tstamp': datetime.utcnow().timestamp(),
+        'url_base': url_for('index', _external=True),
+        'url_preguntas': url_for('preguntas', _external=True)
     }
-
     headers = {
         'MyHeader': 'MyHeaderValueHere'
     }
-
-    return make_response(
-        jsonify(
-            data
-        ), 200, headers)
+    return make_response(data, 200, headers)
 
 
 def main():
