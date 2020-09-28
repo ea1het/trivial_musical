@@ -83,6 +83,23 @@ def post_preguntas():
     pass
 
 
+@APP.route('/niveles', methods=['GET'])
+def get_niveles():
+    """ Return the full list of 'niveles' defined (should be a little """
+
+
+
+
+    data = {
+        'tstamp': datetime.utcnow().timestamp(),
+        'url_base': url_for('index', _external=True),
+        'url_niveles': url_for('get_niveles', _external=True)
+    }
+    headers = {}
+    return make_response(data, 200, headers)
+
+
+
 @APP.route('/niveles', methods=['POST'])
 def post_niveles():
     """ TBD """
@@ -125,6 +142,7 @@ def index():
 
 
 def main():
+
     APP.run(host='0.0.0.0', port=5000)
 
 
