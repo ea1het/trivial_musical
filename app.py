@@ -8,7 +8,7 @@
 __author__ = 'EA1HET, EA1GIY'
 __date__ = '12/09/2020'
 
-from flask import Flask, make_response, url_for
+from flask import Flask, make_response, url_for, request
 from datetime import datetime
 import settings
 
@@ -66,30 +66,37 @@ def after_request(response):
 
 
 # -- This is where the API effectively starts. -------------------------------
-@APP.route('/preguntas', methods=['GET'])
-def get_preguntas():
+@APP.route('/preguntas', methods=['GET', 'POST'])
+def preguntas():
     """ TBD """
+
+    # If request methos was POST...
+    if request.method == 'POST':
+        data = {'Method': 'POST'}
+        headers = {}
+        return make_response(data, 200, headers)
+
+    # ... otherwise, defaults to GET method
     data = {
         'tstamp': datetime.utcnow().timestamp(),
         'base_url': url_for('index', _external=True)
     }
     headers = {}
+
     return make_response(data, 200, headers)
 
 
-@APP.route('/preguntas', methods=['POST'])
-def post_preguntas():
-    """ TBD """
-    pass
-
-
-@APP.route('/niveles', methods=['GET'])
-def get_niveles():
+@APP.route('/niveles', methods=['GET', 'POST'])
+def niveles():
     """ Return the full list of 'niveles' defined (should be a little """
 
+    # If request methos was POST...
+    if request.method == 'POST':
+        data = {'Method': 'POST'}
+        headers = {}
+        return make_response(data, 200, headers)
 
-
-
+    # ... otherwise, defaults to GET method
     data = {
         'tstamp': datetime.utcnow().timestamp(),
         'url_base': url_for('index', _external=True),
@@ -99,27 +106,20 @@ def get_niveles():
     return make_response(data, 200, headers)
 
 
-
-@APP.route('/niveles', methods=['POST'])
-def post_niveles():
+@APP.route('/tiempos', methods=['GET', 'POST'])
+def tiempos():
     """ TBD """
     pass
 
 
-@APP.route('/tiempos', methods=['POST'])
-def post_tiempos():
+@APP.route('/categorias/subcategorias', methods=['GET', 'POST'])
+def subcategorias():
     """ TBD """
     pass
 
 
-@APP.route('/categorias/subcategorias', methods=['POST'])
-def post_subcategorias():
-    """ TBD """
-    pass
-
-
-@APP.route('/categorias', methods=['POST'])
-def post_categorias():
+@APP.route('/categorias', methods=['GET', 'POST'])
+def categorias():
     """ TBD """
     pass
 
