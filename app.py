@@ -17,14 +17,14 @@ import psycopg2
 import settings
 
 
-# -- Application initialization. ---------------------------------------------
+# -- Application initialization. ---------------------------------------------s
 APP = Flask('trivial_musical')
 APP.config.from_object(getattr(settings, 'Config'))
 
 
 # -- Incoming data validation with Cerberus. ---------------------------------
 schema_categoria = {
-    'categoria': {'type': 'string'}
+    'categoria': {'type': 'string', 'empty': False}
 }
 
 
@@ -153,16 +153,23 @@ def categorias():
             with conn.cursor() as c:
 
                 v = Validator(schema_categoria)
-                documento = request.get_json()
+                doc = request.get_json()
 
-                if v.validate(documento):
+                if v.validate(doc):
                     new_cat = request.get_json()['categoria']
-                    c.execute('INSERT INTO trivial_schema.categorias (categoria) VALUES %s' % str(new_cat))
-                    c.commit()
-
+                    sql = f"INSERT INTO trivial_schema.categorias (categoria, notas) " \
+                          f"VALUES('{new_cat}', '');"
+                    c.execute(sql)
+                    conn.commit()
                     data = {
-                        'result': 'OK',
+                        'result': 'ok',
                         'message': 'row successfully inserted into database'
+                    }
+                else:
+                    data = {
+                        'result': 'ko',
+                        'message': 'data mismatch',
+                        'error': v.errors
                     }
 
         # ... eventually it can also be a DELETE ...
