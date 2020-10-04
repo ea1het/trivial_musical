@@ -30,10 +30,11 @@ class Config:
     DEBUG = ENVIR.bool('DEBUG', False)
     TESTING = ENVIR.bool('TESTING', False)
 
+    DB_TYPE = ENVIR('DB_TYPE', 'postgres')
     DB_HOST = ENVIR('DB_HOST', None)
-    DB_PORT = ENVIR('DB_PORT', 3306)
+    DB_PORT = ENVIR('DB_PORT', 5432)
     DB_USER = ENVIR('DB_USER', None)
     DB_PASSWORD = ENVIR('DB_PASSWORD', None)
     DB_DATABASE = ENVIR('DB_DATABASE', None)
 
-    SECRET_KEY = ENVIR('SECRET_KEY') or 'NoSecretKeyDefined'
+    SECRET_KEY = ENVIR('SECRET_KEY', 'NoSecretKeyDefined')

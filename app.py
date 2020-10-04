@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=locally-disabled, multiple-statements
 # pylint: disable=fixme, line-too-long, invalid-name
+# pylint: disable=wrong-spelling-in-comment
 # pylint: disable=W0703
 
 """ Trivial Musical """
@@ -8,13 +9,34 @@
 __author__ = 'EA1HET, EA1GIY'
 __date__ = '12/09/2020'
 
+
 from flask import Flask, make_response, url_for, request
 from datetime import datetime
+from cerberus import Validator
+import psycopg2
 import settings
+
 
 # -- Application initialization. ---------------------------------------------
 APP = Flask('trivial_musical')
 APP.config.from_object(getattr(settings, 'Config'))
+
+
+# -- Incoming data validation with Cerberus. ---------------------------------
+schema_categoria = {
+    'categoria': {'type': 'string'}
+}
+
+
+# -- Database connection initialization. -------------------------------------
+def db_connect():
+    db = f'host={settings.Config.DB_HOST} ' \
+         f'port={settings.Config.DB_PORT} ' \
+         f'user={settings.Config.DB_USER} ' \
+         f'password={settings.Config.DB_PASSWORD} ' \
+         f'dbname={settings.Config.DB_DATABASE}'
+    c = psycopg2.connect(db)
+    return c
 
 
 # -- This functions control how to respond to common errors. -----------------
@@ -100,7 +122,7 @@ def niveles():
     data = {
         'tstamp': datetime.utcnow().timestamp(),
         'url_base': url_for('index', _external=True),
-        'url_niveles': url_for('get_niveles', _external=True)
+        'url_niveles': url_for('niveles', _external=True)
     }
     headers = {}
     return make_response(data, 200, headers)
@@ -118,10 +140,59 @@ def subcategorias():
     pass
 
 
-@APP.route('/categorias', methods=['GET', 'POST'])
+@APP.route('/categorias', methods=['GET', 'POST', 'DELETE'])
 def categorias():
-    """ TBD """
-    pass
+    """ Categorias de las preguntas de Trivial """
+
+    data = {}
+    try:
+        conn = db_connect()
+
+        # If request method was POST ...
+        if request.method == 'POST':
+            with conn.cursor() as c:
+
+                v = Validator(schema_categoria)
+                documento = request.get_json()
+
+                if v.validate(documento):
+                    new_cat = request.get_json()['categoria']
+                    c.execute('INSERT INTO trivial_schema.categorias (categoria) VALUES %s' % str(new_cat))
+                    c.commit()
+
+                    data = {
+                        'result': 'OK',
+                        'message': 'row successfully inserted into database'
+                    }
+
+        # ... eventually it can also be a DELETE ...
+        elif request.method == 'DELETE':
+            data = {'operacion': 'delete'}
+
+        # ... otherwise, defaults to GET method
+        else:
+            with conn.cursor() as c:
+                c.execute('SELECT * FROM trivial_schema.categorias;')
+                res = c.fetchall()
+
+            r_dict = {}
+            for _ in res:
+                r_dict[_[0]] = _[1]
+
+            data = {
+                'tstamp': datetime.utcnow().timestamp(),
+                'url_base': url_for('index', _external=True),
+                'url_niveles': url_for('categorias', _external=True),
+                'registros': r_dict
+            }
+
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+        data = {'msg': f'Error {e}'}
+
+    finally:
+        headers = {}
+        return make_response(data, 200, headers)
 
 
 @APP.route('/', methods=['GET'])
@@ -133,16 +204,14 @@ def index():
     data = {
         'tstamp': datetime.utcnow().timestamp(),
         'url_base': url_for('index', _external=True),
-        'url_preguntas': url_for('get_preguntas', _external=True)
+        'url_preguntas': url_for('preguntas', _external=True)
     }
-    headers = {
-        'MyHeader': 'MyHeaderValueHere'
-    }
+
+    headers = {}
     return make_response(data, 200, headers)
 
 
 def main():
-
     APP.run(host='0.0.0.0', port=5000)
 
 
