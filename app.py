@@ -142,7 +142,6 @@ def subcategorias():
 
 
 @APP.route('/categorias', methods=['GET', 'POST', 'DELETE'])
-@APP.route('/categorias/<int>', methods=['POST', 'DELETE'])
 def categorias():
     """ Categorias de las preguntas de Trivial """
 
