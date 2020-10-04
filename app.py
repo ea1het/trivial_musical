@@ -10,14 +10,14 @@ __author__ = 'EA1HET, EA1GIY'
 __date__ = '12/09/2020'
 
 
-from flask import Flask, make_response, url_for, request
 from datetime import datetime
+from flask import Flask, make_response, url_for, request
 from cerberus import Validator
 import psycopg2
 import settings
 
 
-# -- Application initialization. ---------------------------------------------s
+# -- Application initialization. ---------------------------------------------
 APP = Flask('trivial_musical')
 APP.config.from_object(getattr(settings, 'Config'))
 
@@ -30,6 +30,7 @@ schema_categoria = {
 
 # -- Database connection initialization. -------------------------------------
 def db_connect():
+    """ Databse connection to PostgreSQL """
     db = f'host={settings.Config.DB_HOST} ' \
          f'port={settings.Config.DB_PORT} ' \
          f'user={settings.Config.DB_USER} ' \
@@ -141,8 +142,12 @@ def subcategorias():
 
 
 @APP.route('/categorias', methods=['GET', 'POST', 'DELETE'])
+@APP.route('/categorias/<int>', methods=['POST', 'DELETE'])
 def categorias():
     """ Categorias de las preguntas de Trivial """
+
+    data = {}
+    http_code = ''
 
     try:
         conn = db_connect()
@@ -170,9 +175,7 @@ def categorias():
                         'message': 'data mismatch',
                         'error': v.errors
                     }
-                    http_code = 404
-            headers = {}
-            return make_response(data, http_code, headers)
+                    http_code = 403
 
         # ... eventually it can also be a DELETE ...
         elif request.method == 'DELETE':
@@ -197,9 +200,7 @@ def categorias():
                         'message': 'data mismatch',
                         'error': v.errors
                     }
-                    http_code = 405
-            headers = {}
-            return make_response(data, http_code, headers)
+                    http_code = 403
 
         # ... otherwise, defaults to GET method
         else:
@@ -212,15 +213,15 @@ def categorias():
             for _ in res:
                 reg_dict[_[0]] = _[1]
 
+            print(reg_dict)
+
             data = {
                 'tstamp': datetime.utcnow().timestamp(),
                 'url_base': url_for('index', _external=True),
-                'url_niveles': url_for('categorias', _external=True),
+                'url_categorias': url_for('categorias', _external=True),
                 'registros': reg_dict
             }
             http_code = 200
-            headers = {}
-            return make_response(data, http_code, headers)
 
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
@@ -229,12 +230,11 @@ def categorias():
             'message': 'server side error',
             'error': f'Error {e}'
         }
-        headers = {}
         http_code = 500
-        return make_response(data, http_code, headers)
 
     finally:
-        print('pase por aqui')
+        headers = {}
+        return make_response(data, http_code, headers)
 
 
 @APP.route('/', methods=['GET'])
@@ -254,6 +254,7 @@ def index():
 
 
 def main():
+    """ Main programme """
     APP.run(host='0.0.0.0', port=5000)
 
 
