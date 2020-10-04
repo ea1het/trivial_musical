@@ -144,62 +144,97 @@ def subcategorias():
 def categorias():
     """ Categorias de las preguntas de Trivial """
 
-    data = {}
     try:
         conn = db_connect()
 
         # If request method was POST ...
         if request.method == 'POST':
             with conn.cursor() as c:
-
                 v = Validator(schema_categoria)
                 doc = request.get_json()
 
                 if v.validate(doc):
-                    new_cat = request.get_json()['categoria']
+                    post_cat = request.get_json()['categoria']
                     sql = f"INSERT INTO trivial_schema.categorias (categoria, notas) " \
-                          f"VALUES('{new_cat}', '');"
+                          f"VALUES('{post_cat}', '');"
                     c.execute(sql)
                     conn.commit()
                     data = {
                         'result': 'ok',
                         'message': 'row successfully inserted into database'
                     }
+                    http_code = 200
                 else:
                     data = {
                         'result': 'ko',
                         'message': 'data mismatch',
                         'error': v.errors
                     }
+                    http_code = 404
+            headers = {}
+            return make_response(data, http_code, headers)
 
         # ... eventually it can also be a DELETE ...
         elif request.method == 'DELETE':
-            data = {'operacion': 'delete'}
+
+            with conn.cursor() as c:
+                v = Validator(schema_categoria)
+                doc = request.get_json()
+
+                if v.validate(doc):
+                    del_cat = request.get_json()['categoria']
+                    sql = f"DELETE FROM trivial_schema.categorias WHERE categoria = '{del_cat}';"
+                    c.execute(sql)
+                    conn.commit()
+                    data = {
+                        'result': 'ok',
+                        'message': 'row successfully removed from database'
+                    }
+                    http_code = 200
+                else:
+                    data = {
+                        'result': 'ko',
+                        'message': 'data mismatch',
+                        'error': v.errors
+                    }
+                    http_code = 405
+            headers = {}
+            return make_response(data, http_code, headers)
 
         # ... otherwise, defaults to GET method
         else:
             with conn.cursor() as c:
-                c.execute('SELECT * FROM trivial_schema.categorias;')
+                sql = "SELECT * FROM trivial_schema.categorias;"
+                c.execute(sql)
                 res = c.fetchall()
 
-            r_dict = {}
+            reg_dict = {}
             for _ in res:
-                r_dict[_[0]] = _[1]
+                reg_dict[_[0]] = _[1]
 
             data = {
                 'tstamp': datetime.utcnow().timestamp(),
                 'url_base': url_for('index', _external=True),
                 'url_niveles': url_for('categorias', _external=True),
-                'registros': r_dict
+                'registros': reg_dict
             }
+            http_code = 200
+            headers = {}
+            return make_response(data, http_code, headers)
 
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
-        data = {'msg': f'Error {e}'}
+        data = {
+            'result': 'ko',
+            'message': 'server side error',
+            'error': f'Error {e}'
+        }
+        headers = {}
+        http_code = 500
+        return make_response(data, http_code, headers)
 
     finally:
-        headers = {}
-        return make_response(data, 200, headers)
+        print('pase por aqui')
 
 
 @APP.route('/', methods=['GET'])
