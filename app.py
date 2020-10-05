@@ -158,16 +158,37 @@ def categorias():
                 doc = request.get_json()
 
                 if v.validate(doc):
-                    post_cat = request.get_json()['categoria']
-                    sql = f"INSERT INTO trivial_schema.categorias (categoria, notas) " \
-                          f"VALUES('{post_cat}', '');"
+                    sql = "SELECT * FROM trivial_schema.categorias;"
                     c.execute(sql)
-                    conn.commit()
-                    data = {
-                        'result': 'ok',
-                        'message': 'row successfully inserted into database'
-                    }
-                    http_code = 200
+                    res = c.fetchall()
+                    reg_dict = {}
+                    for _ in res:
+                        reg_dict[_[0]] = _[1]
+                    post_cat = request.get_json()
+
+                    if post_cat['categoria'] not in reg_dict.values():
+                        sql = f"INSERT INTO trivial_schema.categorias (categoria, notas) " \
+                              f"VALUES('{post_cat['categoria']}', '');"
+                        c.execute(sql)
+                        conn.commit()
+                        data = {
+                            'tstamp': datetime.utcnow().timestamp(),
+                            'url_base': url_for('index', _external=True),
+                            'url_categorias': url_for('categorias', _external=True),
+                            'result': 'ok',
+                            'message': 'row successfully inserted into database',
+                            'registro': post_cat
+                        }
+                        http_code = 200
+                    else:
+                        data = {
+                            'tstamp': datetime.utcnow().timestamp(),
+                            'url_base': url_for('index', _external=True),
+                            'url_categorias': url_for('categorias', _external=True),
+                            'result': 'ko',
+                            'error': 'Value exist in database'
+                        }
+                        http_code = 409
                 else:
                     data = {
                         'result': 'ko',
@@ -184,15 +205,38 @@ def categorias():
                 doc = request.get_json()
 
                 if v.validate(doc):
-                    del_cat = request.get_json()['categoria']
-                    sql = f"DELETE FROM trivial_schema.categorias WHERE categoria = '{del_cat}';"
+                    sql = "SELECT * FROM trivial_schema.categorias;"
                     c.execute(sql)
-                    conn.commit()
-                    data = {
-                        'result': 'ok',
-                        'message': 'row successfully removed from database'
-                    }
-                    http_code = 200
+                    res = c.fetchall()
+                    reg_dict = {}
+                    for _ in res:
+                        reg_dict[_[0]] = _[1]
+                    del_cat = request.get_json()
+
+                    if del_cat['categoria'] in reg_dict.values():
+                        print('existe en la categoria')
+                        sql = f"DELETE FROM trivial_schema.categorias WHERE categoria = '{del_cat['categoria']}';"
+                        c.execute(sql)
+                        conn.commit()
+                        data = {
+                            'tstamp': datetime.utcnow().timestamp(),
+                            'url_base': url_for('index', _external=True),
+                            'url_categorias': url_for('categorias', _external=True),
+                            'result': 'ok',
+                            'message': 'row successfully deleted from database',
+                            'registro': del_cat
+                        }
+                        http_code = 200
+                    else:
+                        data = {
+                            'tstamp': datetime.utcnow().timestamp(),
+                            'url_base': url_for('index', _external=True),
+                            'url_categorias': url_for('categorias', _external=True),
+                            'result': 'ko',
+                            'error': 'Value does not exist in database'
+                        }
+                        http_code = 404
+
                 else:
                     data = {
                         'result': 'ko',
@@ -211,8 +255,6 @@ def categorias():
             reg_dict = {}
             for _ in res:
                 reg_dict[_[0]] = _[1]
-
-            print(reg_dict)
 
             data = {
                 'tstamp': datetime.utcnow().timestamp(),
