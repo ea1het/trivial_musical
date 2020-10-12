@@ -14,14 +14,17 @@ you can use a '.env' file locally. In run time, if you are using containers, you
 environment variables injected upon container instantiation. 
 
 ```
-export DEV_SK = 'LONG_STRING_HERE'
-export DEV_DB = 'HOST=localhost,USER=user,PASS=pass,DATABASE=db_name'
+export SECRET_KEY = 'Qs----------------------------------------------4azm'
 
-export TST_SK = 'LONG_STRING_HERE'
-export TST_DB = 'HOST=test_server,USER=user,PASS=pass,DATABASE=db_name'
+export DB_TYPE = 'postgres'
+export DB_HOST = 'localhost'
+export DB_PORT = 5432
+export DB_USER = 'DB_user'
+export DB_PASSWORD = 'DB_pass'
+export DB_DATABASE = 'DB_name'
 
-export PRD_SK = 'LONG_STRING_HERE'
-export PRD_DB = 'HOST=prod_server,USER=user,PASS=pass,DATABASE=db_name'
+export ENV = 'development'
+export DEBUG = True
+export TESTING = false
 
-export MODE_CONFIG = 'Development'
 ```
